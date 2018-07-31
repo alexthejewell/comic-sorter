@@ -1,24 +1,35 @@
+import re
+import shutil
+
+
 class Comic:
+    pattern = r'([a-zA-Z0-9\ \_\-\'\.\!\&\,]+) (\d+\.?\d*).*\((\d+)\).*'
+
     def __init__(self, name):
         self.name = name
         self.fixed_name = self.fix_name(name)
-        self.year = self.get_year()
-        self.issue_number = self.get_issue_number()
-        self.comic_name = self.get_comic_name()
+        self.folder_name = "UNKNOWN"
+
+        match_object = re.match(self.pattern, self.fixed_name)
+
+        if match_object is not None:
+            self.comic_name = match_object.group(1)
+            self.folder_name = self.comic_name
+            self.issue_number = float(match_object.group(2))
+            self.year = int(match_object.group(3))
+
+            if self.issue_number.is_integer():
+                self.issue_number = int(self.issue_number)
+        else:
+            self.comic_name = self.fixed_name
+            self.issue_number = "unknown"
+            self.year = -1
+            print("Invalid Comic Name: {}".format(self.name))
 
     @staticmethod
     def fix_name(name):
         fixed = name.replace("_", " ")
         return fixed
-
-    def get_year(self):
-        pass
-
-    def get_issue_number(self):
-        pass
-
-    def get_comic_name(self):
-        pass
 
 
 class ComicSorter:
@@ -59,7 +70,18 @@ class ComicSorter:
         return parsed_comic
 
     def generate_folders(self):
-        pass
+        folder_list = set()
+        for comic in self._comic_map.values():
+            folder_list.add(comic.folder_name)
+
+        for folder_name in folder_list:
+            folder_path = self._dst / folder_name
+            if not folder_path.exists():
+                folder_path.mkdir()
 
     def copy_comics(self):
-        pass
+        for comic_path, comic in self._comic_map.items():
+            parent_path = self._dst / comic.folder_name
+            new_path = parent_path / comic.fixed_name
+            if not new_path.exists():
+                shutil.copyfile(comic_path, str(new_path))

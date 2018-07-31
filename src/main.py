@@ -7,14 +7,14 @@ print(sys.argv)
 
 if __name__ == "__main__":
     print(sys.argv)
-    if len(sys.argv) not in [2, 3]:
+    if len(sys.argv) not in [3, 4]:
         print("Incorrect number of parameters. Proper usage: comic_sorter <path to find comics> <path to copy comics>")
         print("optional parameter: --folders //only generate folders")
         print("optional parameter: --count //only print a count of comics")
         exit(-1)
 
-    src_dir = sys.argv[0]
-    dst_dir = sys.argv[1]
+    src_dir = sys.argv[1]
+    dst_dir = sys.argv[2]
 
     source = Path(src_dir)
     destination = Path(dst_dir)
@@ -33,9 +33,9 @@ if __name__ == "__main__":
             print("Destination directory is not empty")
             exit(-1)
 
-    if len(sys.argv) == 3 and sys.argv[2] == "--folders":
+    if len(sys.argv) == 4 and sys.argv[3] == "--folders":
         folders_only = True
-    elif len(sys.argv) == 3 and sys.argv[2] == "--count":
+    elif len(sys.argv) == 4 and sys.argv[3] == "--count":
         count_only = True
 
     comic_sorter = ComicSorter(source, destination)
